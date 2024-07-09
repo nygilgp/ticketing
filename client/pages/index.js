@@ -1,33 +1,23 @@
 import React from 'react';
-import axios from 'axios';
+import buildClient from '../api/build-client';
 
 const App = ({ currentUser }) => {
-  console.log(currentUser);
-  return <div>App???</div>;
+  return (
+    <div>
+      {currentUser ? (
+        <h1>You are signed in.</h1>
+      ) : (
+        <h1>You are not signed in.</h1>
+      )}
+    </div>
+  );
 };
 
-App.getInitialProps = async () => {
-  if (typeof window === undefined) {
-    console.log('in server');
-  } else {
-    console.log('in browser');
-    const response = await axios.get(
-      'https://ticketing.dev/api/users/currentuser'
-    );
-    return response.data;
-  }
-
-  // try {
-  //   // ingress-nginx-controller
-  //   // ingress-nginx
-  //   const response = await axios.get(
-  //     'https://ingress-nginx-controller.ingress-nginx.svc.cluster.local/api/users/currentuser'
-  //   );
-  //   console.log(response);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  return {};
+App.getInitialProps = async (context) => {
+  const client = buildClient(context);
+  const { data } = await client.get('api/users/currentuser');
+  console.log('Landing page', data);
+  return data;
 };
 
 export default App;
